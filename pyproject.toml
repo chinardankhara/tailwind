@@ -8,5 +8,10 @@ dependencies = [
     "openai>=1.52.0",
     "python-dotenv>=1.0.1",
     "streamlit-audiorecorder>=0.0.5",
+    "streamlit-option-menu>=0.4.0",
     "streamlit>=1.39.0",
+    "swarm",
 ]
+
+[tool.uv.sources]
+swarm = { git = "https://github.com/openai/swarm.git" }
