@@ -423,6 +423,15 @@ wheels = [
 ]
 
 [[package]]
+name = "google-search-results"
+version = "2.4.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/77/30/b3a6f6a2e00f8153549c2fa345c58ae1ce8e5f3153c2fe0484d444c3abcb/google_search_results-2.4.2.tar.gz", hash = "sha256:603a30ecae2af8e600b22635757a6df275dad4b934f975e67878ccd640b78245", size = 18818 }
+
+[[package]]
 name = "h11"
 version = "0.14.0"
 source = { registry = "https://pypi.org/simple" }
@@ -1417,6 +1426,18 @@ wheels = [
 ]
 
 [[package]]
+name = "serpapi"
+version = "0.1.5"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "requests" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/f0/fa/3fd8809287f3977a3e752bb88610e918d49cb1038b14f4bc51e13e594197/serpapi-0.1.5.tar.gz", hash = "sha256:b9707ed54750fdd2f62dc3a17c6a3fb7fa421dc37902fd65b2263c0ac765a1a5", size = 14191 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/df/6a/21deade04100d64844e494353a5d65e7971fbdfddf78eb1f248423593ad0/serpapi-0.1.5-py2.py3-none-any.whl", hash = "sha256:6467b6adec1231059f754ccaa952b229efeaa8b9cae6e71f879703ec9e5bb3d1", size = 10966 },
+]
+
+[[package]]
 name = "shellingham"
 version = "1.5.4"
 source = { registry = "https://pypi.org/simple" }
@@ -1526,8 +1547,11 @@ name = "tailwind"
 version = "0.1.0"
 source = { virtual = "." }
 dependencies = [
+    { name = "google-search-results" },
     { name = "openai" },
+    { name = "pydantic" },
     { name = "python-dotenv" },
+    { name = "serpapi" },
     { name = "streamlit" },
     { name = "streamlit-audiorecorder" },
     { name = "streamlit-option-menu" },
@@ -1536,8 +1560,11 @@ dependencies = [
 
 [package.metadata]
 requires-dist = [
+    { name = "google-search-results", specifier = ">=2.4.2" },
     { name = "openai", specifier = ">=1.52.0" },
+    { name = "pydantic", specifier = ">=2.9.2" },
     { name = "python-dotenv", specifier = ">=1.0.1" },
+    { name = "serpapi", specifier = ">=0.1.5" },
     { name = "streamlit", specifier = ">=1.39.0" },
     { name = "streamlit-audiorecorder", specifier = ">=0.0.5" },
     { name = "streamlit-option-menu", specifier = ">=0.4.0" },
