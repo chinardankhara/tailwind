@@ -1,0 +1,49 @@
+Flight 1:
+  flights: [{'departure_airport': {'name': 'Hartsfield-Jackson Atlanta International Airport', 'id': 'ATL', 'time': '2024-11-07 08:40'}, 'arrival_airport': {'name': 'John F. Kennedy International Airport', 'id': 'JFK', 'time': '2024-11-07 10:48'}, 'duration': 128, 'airplane': 'Boeing 757', 'airline': 'Delta', 'airline_logo': 'https://www.gstatic.com/flights/airline_logos/70px/DL.png', 'travel_class': 'First Class', 'flight_number': 'DL 1034', 'extensions': ['Standard recliner seat', 'Free Wi-Fi', 'In-seat power & USB outlets', 'Live TV', 'Carbon emissions estimate: 236 kg']}]
+  total_duration: 128
+  carbon_emissions: {'this_flight': 236000, 'typical_for_this_route': 185000, 'difference_percent': 28}
+  price: 712
+  type: Round trip
+  airline_logo: https://www.gstatic.com/flights/airline_logos/70px/DL.png
+  extensions: ['1 checked bag included', 'Bag and fare conditions depend on the return flight']
+  departure_token: WyJDalJJVW5WYVkydzJkbUV6ZDFGQlFsSjFSa0ZDUnkwdExTMHRMUzB0TFhaM1ltUnVNa0ZCUVVGQlIyTnJWV0pGVEZCc1UwdEJFZ1pFVERFd016UWFDd2lickFRUUFob0RWVk5FT0J4d202d0UiLFtbIkFUTCIsIjIwMjQtMTEtMDciLCJKRksiLG51bGwsIkRMIiwiMTAzNCJdXV0=
+
+Flight 2:
+  flights: [{'departure_airport': {'name': 'Hartsfield-Jackson Atlanta International Airport', 'id': 'ATL', 'time': '2024-11-07 09:40'}, 'arrival_airport': {'name': 'John F. Kennedy International Airport', 'id': 'JFK', 'time': '2024-11-07 12:00'}, 'duration': 140, 'airplane': 'Airbus A321neo', 'airline': 'Delta', 'airline_logo': 'https://www.gstatic.com/flights/airline_logos/70px/DL.png', 'travel_class': 'First Class', 'flight_number': 'DL 2466', 'extensions': ['Standard recliner seat', 'Free Wi-Fi', 'In-seat power & USB outlets', 'Live TV', 'Carbon emissions estimate: 153 kg']}]
+  total_duration: 140
+  carbon_emissions: {'this_flight': 153000, 'typical_for_this_route': 185000, 'difference_percent': -17}
+  price: 712
+  type: Round trip
+  airline_logo: https://www.gstatic.com/flights/airline_logos/70px/DL.png
+  extensions: ['1 checked bag included', 'Bag and fare conditions depend on the return flight']
+  departure_token: WyJDalJJVW5WYVkydzJkbUV6ZDFGQlFsSjFSa0ZDUnkwdExTMHRMUzB0TFhaM1ltUnVNa0ZCUVVGQlIyTnJWV0pGVEZCc1UwdEJFZ1pFVERJME5qWWFDd2lickFRUUFob0RWVk5FT0J4d202d0UiLFtbIkFUTCIsIjIwMjQtMTEtMDciLCJKRksiLG51bGwsIkRMIiwiMjQ2NiJdXV0=
+
+Flight 3:
+  flights: [{'departure_airport': {'name': 'Hartsfield-Jackson Atlanta International Airport', 'id': 'ATL', 'time': '2024-11-07 21:20'}, 'arrival_airport': {'name': 'John F. Kennedy International Airport', 'id': 'JFK', 'time': '2024-11-07 23:34'}, 'duration': 134, 'airplane': 'Boeing 737', 'airline': 'Delta', 'airline_logo': 'https://www.gstatic.com/flights/airline_logos/70px/DL.png', 'travel_class': 'First Class', 'flight_number': 'DL 2386', 'extensions': ['Standard recliner seat', 'Free Wi-Fi', 'In-seat power & USB outlets', 'Live TV', 'Carbon emissions estimate: 177 kg']}]
+  total_duration: 134
+  carbon_emissions: {'this_flight': 177000, 'typical_for_this_route': 185000, 'difference_percent': -4}
+  price: 712
+  type: Round trip
+  airline_logo: https://www.gstatic.com/flights/airline_logos/70px/DL.png
+  extensions: ['1 checked bag included', 'Bag and fare conditions depend on the return flight']
+  departure_token: WyJDalJJVW5WYVkydzJkbUV6ZDFGQlFsSjFSa0ZDUnkwdExTMHRMUzB0TFhaM1ltUnVNa0ZCUVVGQlIyTnJWV0pGVEZCc1UwdEJFZ1pFVERJek9EWWFDd2lickFRUUFob0RWVk5FT0J4d202d0UiLFtbIkFUTCIsIjIwMjQtMTEtMDciLCJKRksiLG51bGwsIkRMIiwiMjM4NiJdXV0=
+
+Flight 4:
+  flights: [{'departure_airport': {'name': 'Hartsfield-Jackson Atlanta International Airport', 'id': 'ATL', 'time': '2024-11-07 18:40'}, 'arrival_airport': {'name': 'John F. Kennedy International Airport', 'id': 'JFK', 'time': '2024-11-07 20:59'}, 'duration': 139, 'airplane': 'Boeing 737', 'airline': 'Delta', 'airline_logo': 'https://www.gstatic.com/flights/airline_logos/70px/DL.png', 'travel_class': 'First Class', 'flight_number': 'DL 2378', 'extensions': ['Standard recliner seat', 'Free Wi-Fi', 'In-seat power & USB outlets', 'Live TV', 'Carbon emissions estimate: 177 kg']}]
+  total_duration: 139
+  carbon_emissions: {'this_flight': 177000, 'typical_for_this_route': 185000, 'difference_percent': -4}
+  price: 767
+  type: Round trip
+  airline_logo: https://www.gstatic.com/flights/airline_logos/70px/DL.png
+  extensions: ['1 checked bag included', 'Bag and fare conditions depend on the return flight']
+  departure_token: WyJDalJJVW5WYVkydzJkbUV6ZDFGQlFsSjFSa0ZDUnkwdExTMHRMUzB0TFhaM1ltUnVNa0ZCUVVGQlIyTnJWV0pGVEZCc1UwdEJFZ1pFVERJek56Z2FDd2lYMXdRUUFob0RWVk5FT0J4d2w5Y0UiLFtbIkFUTCIsIjIwMjQtMTEtMDciLCJKRksiLG51bGwsIkRMIiwiMjM3OCJdXV0=
+
+Flight 5:
+  flights: [{'departure_airport': {'name': 'Hartsfield-Jackson Atlanta International Airport', 'id': 'ATL', 'time': '2024-11-07 07:20'}, 'arrival_airport': {'name': 'John F. Kennedy International Airport', 'id': 'JFK', 'time': '2024-11-07 09:35'}, 'duration': 135, 'airplane': 'Boeing 757', 'airline': 'Delta', 'airline_logo': 'https://www.gstatic.com/flights/airline_logos/70px/DL.png', 'travel_class': 'First Class', 'flight_number': 'DL 2420', 'extensions': ['Lie flat seat', 'Free Wi-Fi', 'In-seat power & USB outlets', 'Live TV', 'Carbon emissions estimate: 250 kg']}]
+  total_duration: 135
+  carbon_emissions: {'this_flight': 251000, 'typical_for_this_route': 185000, 'difference_percent': 36}
+  price: 787
+  type: Round trip
+  airline_logo: https://www.gstatic.com/flights/airline_logos/70px/DL.png
+  extensions: ['1 checked bag included', 'Bag and fare conditions depend on the return flight']
+  departure_token: WyJDalJJVW5WYVkydzJkbUV6ZDFGQlFsSjFSa0ZDUnkwdExTMHRMUzB0TFhaM1ltUnVNa0ZCUVVGQlIyTnJWV0pGVEZCc1UwdEJFZ1pFVERJME1qQWFDd2pvNWdRUUFob0RWVk5FT0J4dzZPWUUiLFtbIkFUTCIsIjIwMjQtMTEtMDciLCJKRksiLG51bGwsIkRMIiwiMjQyMCJdXV0=

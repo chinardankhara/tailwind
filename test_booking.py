@@ -10,6 +10,7 @@ def main():
         # Start the booking loop
         initial_prompt = "I want to book a flight."
         flight_params = run_booking_loop(initial_prompt)
+        print(flight_params)
 
         if flight_params.completion:
             # Search for flights using the collected parameters

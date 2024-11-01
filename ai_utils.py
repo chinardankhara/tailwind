@@ -4,6 +4,7 @@ from openai import OpenAI
 import os
 from dotenv import load_dotenv
 from models import FlightParams, AIResponse
+import json
 
 load_dotenv()
 
@@ -14,12 +15,12 @@ FLIGHT_PARAMS_SCHEMA = {
     "type": "object",
     "properties": {
         "departure_id": {
-            "type": "string",
+            "type": "string (IATA code)",
             "description": "Airport code for departure (e.g., 'CDG')",
             "pattern": "^[A-Z]{3}$"
         },
         "arrival_id": {
-            "type": "string",
+            "type": "string (IATA code)",
             "description": "Airport code for arrival (e.g., 'AUS')",
             "pattern": "^[A-Z]{3}$"
         },
@@ -29,12 +30,12 @@ FLIGHT_PARAMS_SCHEMA = {
             "description": "1 for round trip, 2 for one way"
         },
         "outbound_date": {
-            "type": "string",
+            "type": "string (YYYY-MM-DD)",
             "format": "date",
             "description": "Departure date in YYYY-MM-DD format"
         },
         "return_date": {
-            "type": "string",
+            "type": "string (YYYY-MM-DD)",
             "format": "date",
             "description": "Return date in YYYY-MM-DD format (required if trip_type is 1)"
         },
@@ -50,7 +51,7 @@ FLIGHT_PARAMS_SCHEMA = {
         },
         "message": {
             "type": "string",
-            "description": "Message to prompt the user for missing information"
+            "description": "Message to prompt the user for missing information. Null if no missing information."
         },
         "completion": {
             "type": "boolean",
@@ -76,6 +77,8 @@ def get_model_response(
     Returns:
         AIResponse object containing updated parameters, message, and completion flag
     """
+    with open("booking_prompt.json", "r") as file:
+        booking_prompt = json.load(file)["booking loop prompt"]
     try:
         response = client.chat.completions.create(
             model="gpt-4o-2024-08-06",
@@ -83,12 +86,7 @@ def get_model_response(
                 {
                     "role": "system",
                     "content": (
-                        "You are an AI assistant helping to collect flight booking parameters. "
-                        "Analyze user input and current parameters to update the flight booking information. "
-                        "Provide a message to the user requesting any missing information. "
-                        "Set 'completion' to true only when all required parameters are properly filled. "
-                        "Respond in JSON format adhering to the following schema:\n\n"
-                        f"{FLIGHT_PARAMS_SCHEMA}"
+                        f"{booking_prompt}\n{FLIGHT_PARAMS_SCHEMA}"
                     )
                 },
                 {"role": "user", "content": prompt},
@@ -98,9 +96,7 @@ def get_model_response(
                 }
             ]
         )
-
         # Extract and parse the JSON response
-        print(response)
         assistant_message = response.choices[0].message.content
         structured_response = parse_json_from_text(assistant_message)
         ai_response = AIResponse(**structured_response)
@@ -123,19 +119,39 @@ def parse_json_from_text(text: str) -> Dict[str, Any]:
     import json
     import re
 
+    print(f"DEBUG - Raw response to parse: {text}")
+
+    # First, check if the response is just plain text (no JSON structure)
+    if not any(char in text for char in "{["):
+        # If it's plain text, wrap it as a message
+        return {
+            "message": text.strip(),
+            "completion": False
+        }
+
     try:
-        # Regex to find JSON block
-        json_pattern = re.compile(r"```json\s*(\{.*\})\s*```", re.DOTALL)
-        match = json_pattern.search(text)
-        if match:
-            json_str = match.group(1)
-            return json.loads(json_str)
-        else:
-            # Attempt to parse JSON without code block
-            return json.loads(text)
-    except json.JSONDecodeError:
-        print("Failed to parse JSON from the response.")
-        return {}
+        # Pattern 1: JSON with code block markers
+        json_patterns = [
+            r"```json\s*(\{.*?\})\s*```",  # JSON code block
+            r"```\s*(\{.*?\})\s*```",      # Generic code block
+            r"\{.*?\}"                      # Raw JSON
+        ]
+
+        for pattern in json_patterns:
+            matches = re.search(pattern, text, re.DOTALL)
+            if matches:
+                if pattern.startswith(r"\{"):
+                    json_str = matches.group(0)  # Use entire match for raw JSON
+                else:
+                    json_str = matches.group(1)  # Use capture group for code blocks
+                
+                json_str = json_str.strip()
+                print(f"DEBUG - Extracted JSON string: {json_str}")
+                return json.loads(json_str)
+
+    except json.JSONDecodeError as e:
+        print(f"JSON Parse Error: {str(e)}")
+        return
 
 
 def update_parameters(
@@ -144,18 +160,11 @@ def update_parameters(
 ) -> FlightParams:
     """
     Update current parameters with new values from AI response.
-
-    Args:
-        current_params: Current FlightParams instance
-        ai_response: AIResponse object with updated parameters
-
-    Returns:
-        Updated FlightParams instance
     """
     update_data = ai_response.dict(exclude_unset=True)
-    # Remove 'message' and 'completion' to avoid conflicts
+    # Remove only 'message' as we need to keep 'completion'
     update_data.pop("message", None)
-    update_data.pop("completion", None)
+    # Keep the completion status from the AI response
     updated_params = current_params.copy(update=update_data)
     return updated_params
 
@@ -190,16 +199,16 @@ def run_booking_loop(initial_prompt: str = "I want to book a flight.") -> Flight
     user_input = initial_prompt
 
     while not current_params.completion:
-        print("hi1")
         ai_response = get_model_response(user_input, current_params)
+        print(f"DEBUG - AI Response: {ai_response}")
 
         if not ai_response:
             print("Failed to get a valid response from the AI.")
             break
-        print("hi2")
         # Update parameters with AI response
         try:
             current_params = update_parameters(current_params, ai_response)
+            print(f"DEBUG - Updated params: {current_params}")
         except Exception as e:
             print(f"Error updating parameters: {str(e)}")
             break

@@ -60,14 +60,14 @@ def search_flights(
         "hl": "en",
         "adults": adults,
         "travel_class": travel_class,
-        "include_airlines": "SKYTEA",
+        "include_airlines": "SKYTEAM",
         "api_key": os.getenv("SERPAPI_API_KEY"),
     }
 
     # Add return date if round trip
     if trip_type == 1:
         params["return_date"] = return_date
-
+    print("hi1")
     try:
         search = GoogleSearch(params)
         results = search.get_dict()
@@ -87,6 +87,6 @@ def search_flights(
 
         # Return at most MAX_FLIGHTS_TO_RETURN flights
         return all_flights[:MAX_FLIGHTS_TO_RETURN]
-
+        print("hi2")
     except Exception as e:
         raise RuntimeError(f"Flight search failed: {str(e)}") from e
