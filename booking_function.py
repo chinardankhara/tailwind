@@ -14,10 +14,12 @@ def search_flights(
     departure_id: str,
     arrival_id: str,
     outbound_date: str,
-    trip_type: int = 1,  # 1=round trip, 2=one way
+    trip_type: int = 1,
     return_date: Optional[str] = None,
     adults: int = 1,
-    travel_class: int = 1,  # 1=Economy default
+    travel_class: int = 1,
+    outbound_times: Optional[str] = None,
+    return_times: Optional[str] = None,
     api_key: str = "your_api_key_here",
 ) -> List[Dict[str, Any]]:
     """
@@ -31,6 +33,8 @@ def search_flights(
         return_date: Return date in YYYY-MM-DD format (required if trip_type=1)
         adults: Number of adult passengers
         travel_class: 1=Economy, 2=Premium economy, 3=Business, 4=First
+        outbound_times: Optional comma-separated time ranges for outbound flight
+        return_times: Optional comma-separated time ranges for return flight
         api_key: SerpAPI key
 
     Returns:
@@ -40,17 +44,7 @@ def search_flights(
     if trip_type == 1 and not return_date:
         raise ValueError("Return date is required for round trip flights")
 
-    # Validate dates format and logic
-    try:
-        outbound = datetime.strptime(outbound_date, "%Y-%m-%d")
-        if return_date:
-            return_dt = datetime.strptime(return_date, "%Y-%m-%d")
-            if return_dt < outbound:
-                raise ValueError("Return date cannot be before departure date")
-    except ValueError as e:
-        raise ValueError("Invalid date format. Use YYYY-MM-DD") from e
-
-    # Construct SerpAPI parameters
+    # Construct base parameters
     params = {
         "engine": "google_flights",
         "departure_id": departure_id.upper(),
@@ -61,29 +55,30 @@ def search_flights(
         "travel_class": travel_class,
         "include_airlines": "SKYTEAM",
         "api_key": os.getenv("SERPAPI_API_KEY"),
-        "type": 1,
+        "type": 2 if trip_type == 2 else 1
     }
-    
-    # Add return date if round trip
+
+    # Add return date for round trips
     if trip_type == 1:
         params["return_date"] = return_date
-    else:
-        params["type"] = 2
+        
+    # Add time preferences only if specified
+    if outbound_times:
+        params["outbound_times"] = outbound_times
+    if return_times and trip_type == 1:
+        params["return_times"] = return_times
+
     try:
         search = GoogleSearch(params)
         results = search.get_dict()
-        # Consolidate flights into a single list
+        
+        # Consolidate and return flights
         all_flights = []
-        # Add best flights if available
-        best_flights = results.get("best_flights", [])
-        all_flights.extend(best_flights)
-
-        # Add other flights if needed to reach MAX_FLIGHTS_TO_RETURN
+        all_flights.extend(results.get("best_flights", []))
         if len(all_flights) < MAX_FLIGHTS_TO_RETURN:
             other_flights = results.get("other_flights", [])
             remaining_slots = MAX_FLIGHTS_TO_RETURN - len(all_flights)
             all_flights.extend(other_flights[:remaining_slots])
-        # Return at most MAX_FLIGHTS_TO_RETURN flights
         return all_flights[:MAX_FLIGHTS_TO_RETURN]
     except Exception as e:
         raise RuntimeError(f"Flight search failed: {str(e)}") from e

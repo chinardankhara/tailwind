@@ -56,6 +56,16 @@ FLIGHT_PARAMS_SCHEMA = {
         "completion": {
             "type": "boolean",
             "description": "Indicates whether all required parameters are filled"
+        },
+        "outbound_times": {
+            "type": "string",
+            "description": "Comma-separated time ranges for outbound flight (e.g., '4,18,3,19' for 4AM-6PM departure, 3AM-7PM arrival)",
+            "pattern": "^\\d{1,2}(,\\d{1,2}){1,3}$"
+        },
+        "return_times": {
+            "type": "string",
+            "description": "Comma-separated time ranges for return flight (e.g., '4,18,3,19' for 4AM-6PM departure, 3AM-7PM arrival)",
+            "pattern": "^\\d{1,2}(,\\d{1,2}){1,3}$"
         }
     },
     "required": ["completion"],

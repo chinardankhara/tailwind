@@ -45,6 +45,14 @@ class FlightParams(BaseModel):
         False,
         description="Indicates whether all required parameters are filled"
     )
+    outbound_times: Optional[str] = Field(
+        None,
+        description="Comma-separated time ranges for outbound flight (e.g., '4,18,3,19')"
+    )
+    return_times: Optional[str] = Field(
+        None,
+        description="Comma-separated time ranges for return flight (e.g., '4,18,3,19')"
+    )
 
     @validator("departure_id", "arrival_id")
     def airport_code_must_be_valid(cls, v):
@@ -72,6 +80,20 @@ class FlightParams(BaseModel):
                 raise ValueError("Return date cannot be before departure date.")
         return v
 
+    @validator("outbound_times", "return_times")
+    def validate_times(cls, v):
+        if v is None:
+            return v
+        try:
+            times = [int(t.strip()) for t in v.split(",")]
+            if len(times) not in [2, 4]:
+                raise ValueError("Times must contain either 2 or 4 comma-separated numbers")
+            if any(t < 0 or t > 23 for t in times):
+                raise ValueError("Times must be between 0 and 23")
+            return v
+        except ValueError as e:
+            raise ValueError(f"Invalid time format: {str(e)}")
+
 
 class AIResponse(BaseModel):
     departure_id: Optional[str] = None
@@ -83,3 +105,5 @@ class AIResponse(BaseModel):
     travel_class: Optional[int] = None
     message: Optional[str] = None  # Message to prompt the user
     completion: Optional[bool] = False 
+    outbound_times: Optional[str] = None
+    return_times: Optional[str] = None
