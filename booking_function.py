@@ -56,25 +56,24 @@ def search_flights(
         "departure_id": departure_id.upper(),
         "arrival_id": arrival_id.upper(),
         "outbound_date": outbound_date,
-        "currency": "USD",
         "hl": "en",
         "adults": adults,
         "travel_class": travel_class,
         "include_airlines": "SKYTEAM",
         "api_key": os.getenv("SERPAPI_API_KEY"),
+        "type": 1,
     }
-
+    
     # Add return date if round trip
     if trip_type == 1:
         params["return_date"] = return_date
-    print("hi1")
+    else:
+        params["type"] = 2
     try:
         search = GoogleSearch(params)
         results = search.get_dict()
-
         # Consolidate flights into a single list
         all_flights = []
-
         # Add best flights if available
         best_flights = results.get("best_flights", [])
         all_flights.extend(best_flights)
@@ -84,9 +83,7 @@ def search_flights(
             other_flights = results.get("other_flights", [])
             remaining_slots = MAX_FLIGHTS_TO_RETURN - len(all_flights)
             all_flights.extend(other_flights[:remaining_slots])
-
         # Return at most MAX_FLIGHTS_TO_RETURN flights
         return all_flights[:MAX_FLIGHTS_TO_RETURN]
-        print("hi2")
     except Exception as e:
         raise RuntimeError(f"Flight search failed: {str(e)}") from e
