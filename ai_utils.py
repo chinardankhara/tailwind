@@ -5,6 +5,8 @@ import os
 from dotenv import load_dotenv
 from models import FlightParams, AIResponse
 import json
+from datetime import datetime
+import pytz
 
 load_dotenv()
 
@@ -89,6 +91,12 @@ def get_model_response(
     """
     with open("booking_prompt.json", "r") as file:
         booking_prompt = json.load(file)["booking loop prompt"]
+    
+    # Get current date and weekday in Eastern Time
+    eastern = pytz.timezone('US/Eastern')
+    now = datetime.now(eastern)
+    current_info = f"Current date: {now.strftime('%Y-%m-%d')}. Today is {now.strftime('%A')} (Eastern Time)."
+    
     try:
         response = client.chat.completions.create(
             model="gpt-4o-2024-08-06",
@@ -96,7 +104,9 @@ def get_model_response(
                 {
                     "role": "system",
                     "content": (
-                        f"{booking_prompt}\n{FLIGHT_PARAMS_SCHEMA}"
+                        f"{booking_prompt}\n\n"
+                        f"{current_info}\n\n"
+                        f"{FLIGHT_PARAMS_SCHEMA}"
                     )
                 },
                 {"role": "user", "content": prompt},
@@ -129,7 +139,7 @@ def parse_json_from_text(text: str) -> Dict[str, Any]:
     import json
     import re
 
-    print(f"DEBUG - Raw response to parse: {text}")
+    #print(f"DEBUG - Raw response to parse: {text}")
 
     # First, check if the response is just plain text (no JSON structure)
     if not any(char in text for char in "{["):
@@ -156,7 +166,7 @@ def parse_json_from_text(text: str) -> Dict[str, Any]:
                     json_str = matches.group(1)  # Use capture group for code blocks
                 
                 json_str = json_str.strip()
-                print(f"DEBUG - Extracted JSON string: {json_str}")
+                #print(f"DEBUG - Extracted JSON string: {json_str}")
                 return json.loads(json_str)
 
     except json.JSONDecodeError as e:
@@ -210,7 +220,7 @@ def run_booking_loop(initial_prompt: str = "I want to book a flight.") -> Flight
 
     while not current_params.completion:
         ai_response = get_model_response(user_input, current_params)
-        print(f"DEBUG - AI Response: {ai_response}")
+        #print(f"DEBUG - AI Response: {ai_response}")
 
         if not ai_response:
             print("Failed to get a valid response from the AI.")
@@ -218,7 +228,7 @@ def run_booking_loop(initial_prompt: str = "I want to book a flight.") -> Flight
         # Update parameters with AI response
         try:
             current_params = update_parameters(current_params, ai_response)
-            print(f"DEBUG - Updated params: {current_params}")
+            #print(f"DEBUG - Updated params: {current_params}")
         except Exception as e:
             print(f"Error updating parameters: {str(e)}")
             break
