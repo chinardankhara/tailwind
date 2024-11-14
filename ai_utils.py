@@ -7,7 +7,7 @@ from models import FlightParams, AIResponse
 import json
 from datetime import datetime
 import pytz
-
+import re
 load_dotenv()
 
 # Initialize the OpenAI client with your API key
@@ -75,55 +75,63 @@ FLIGHT_PARAMS_SCHEMA = {
 }
 
 
+def load_system_prompt() -> str:
+    """Load the system prompt from booking_prompt.json"""
+    try:
+        with open("booking_prompt.json", "r") as f:
+            prompt_data = json.load(f)
+            #get current date, time, day
+            current_date = datetime.now().strftime("%Y-%m-%d")
+            current_day = datetime.now().strftime("%A")
+            prepend = f"Today's date is {current_date} and the day of the week is {current_day}."
+            return prepend + prompt_data["booking loop prompt"]
+    except Exception as e:
+        print(f"Error loading system prompt: {str(e)}")
+        raise
+
+
 def get_model_response(
     prompt: str, 
     current_params: FlightParams
 ) -> AIResponse:
     """
     Get structured response from OpenAI using JSON mode.
-
-    Args:
-        prompt: User's input text
-        current_params: Current state of flight parameters
-
-    Returns:
-        AIResponse object containing updated parameters, message, and completion flag
     """
-    with open("booking_prompt.json", "r") as file:
-        booking_prompt = json.load(file)["booking loop prompt"]
-    
-    # Get current date and weekday in Eastern Time
-    eastern = pytz.timezone('US/Eastern')
-    now = datetime.now(eastern)
-    current_info = f"Current date: {now.strftime('%Y-%m-%d')}. Today is {now.strftime('%A')} (Eastern Time)."
-    
     try:
+        # Load the system prompt
+        system_prompt = load_system_prompt()
+        
         response = client.chat.completions.create(
-            model="gpt-4o-2024-08-06",
+            model="gpt-4-1106-preview",
+            response_format={"type": "json_object"},
             messages=[
                 {
-                    "role": "system",
-                    "content": (
-                        f"{booking_prompt}\n\n"
-                        f"{current_info}\n\n"
-                        f"{FLIGHT_PARAMS_SCHEMA}"
-                    )
+                    "role": "system", 
+                    "content": system_prompt
                 },
-                {"role": "user", "content": prompt},
                 {
-                    "role": "assistant",
-                    "content": f"Current parameters: {current_params.json()}"
+                    "role": "user",
+                    "content": f"Current parameters: {current_params.json()}\nUser input: {prompt}"
                 }
             ]
         )
-        # Extract and parse the JSON response
-        assistant_message = response.choices[0].message.content
-        structured_response = parse_json_from_text(assistant_message)
-        ai_response = AIResponse(**structured_response)
-        return ai_response
+        
+        # Parse the response and ensure it's valid
+        content = response.choices[0].message.content
+        print(f"Debug - AI Response content: {content}")  # Add debug logging
+        
+        parsed_response = json.loads(content)
+        return AIResponse(**parsed_response)
+
     except Exception as e:
-        print(f"Error communicating with OpenAI: {str(e)}")
-        return AIResponse()
+        print(f"Error getting model response: {str(e)}")
+        # Return a default AIResponse instead of None
+        return AIResponse(
+            message="I'm sorry, I encountered an error processing your request. Could you please rephrase that?",
+            completion=False,
+            adults=1,  # Keep existing parameters
+            travel_class=1
+        )
 
 
 def parse_json_from_text(text: str) -> Dict[str, Any]:
@@ -136,8 +144,6 @@ def parse_json_from_text(text: str) -> Dict[str, Any]:
     Returns:
         A dictionary representing the parsed JSON.
     """
-    import json
-    import re
 
     #print(f"DEBUG - Raw response to parse: {text}")
 
