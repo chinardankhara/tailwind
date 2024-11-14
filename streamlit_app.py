@@ -4,45 +4,58 @@ from models import FlightParams, AIResponse
 from booking_function import search_flights
 from datetime import datetime
 
-def display_flight_cards(flights: list):
+def display_flight_cards(flights: list, trip_type: int):
     """Display flight results in a card format."""
     for flight in flights:
         with st.container():
-            st.markdown("---")  # Divider between flights
+            st.markdown("---")
             cols = st.columns([3, 2])
             
             with cols[0]:
-                # Flight details for first leg of journey
-                first_flight = flight["flights"][0]
-                airline = first_flight.get("airline", "Unknown Airline")
-                st.markdown(f"### {airline}")
-                
-                # Show all flight segments
-                for segment in flight["flights"]:
-                    st.markdown(f"""
-                    🛫 **{segment["departure_airport"]["time"]}** from {segment["departure_airport"]["name"]} ({segment["departure_airport"]["id"]})  
-                    🛬 **{segment["arrival_airport"]["time"]}** at {segment["arrival_airport"]["name"]} ({segment["arrival_airport"]["id"]})  
-                    ⏱️ **Duration:** {segment.get("duration", "Unknown")} mins
-                    """)
-                
-                # Show layovers if any
-                if flight.get("layovers"):
-                    st.markdown("**Layovers:**")
-                    for layover in flight["layovers"]:
-                        duration = layover.get("duration", "Unknown")
-                        airport = layover.get("name", "Unknown Airport")
-                        st.markdown(f"- {airport} ({duration} mins)")
+                if trip_type == 1:  # Round trip
+                    # For round trips, each flight in the array is a complete flight
+                    # Outbound flight
+                    st.markdown("### Outbound Flight")
+                    for segment in [flight["flights"][0]]:  # First flight is outbound
+                        st.markdown(f"""
+                        🛫 **{segment["departure_airport"]["time"]}** from {segment["departure_airport"]["name"]} ({segment["departure_airport"]["id"]})  
+                        🛬 **{segment["arrival_airport"]["time"]}** at {segment["arrival_airport"]["name"]} ({segment["arrival_airport"]["id"]})  
+                        ✈️ {segment["airline"]} {segment["flight_number"]}  
+                        ⏱️ **Duration:** {segment["duration"]} mins
+                        """)
+                    
+                    # Return flight
+                    if len(flight["flights"]) > 1:  # Check if we have a return flight
+                        st.markdown("### Return Flight")
+                        for segment in [flight["flights"][1]]:  # Second flight is return
+                            st.markdown(f"""
+                            🛫 **{segment["departure_airport"]["time"]}** from {segment["departure_airport"]["name"]} ({segment["departure_airport"]["id"]})  
+                            🛬 **{segment["arrival_airport"]["time"]}** at {segment["arrival_airport"]["name"]} ({segment["arrival_airport"]["id"]})  
+                            ✈️ {segment["airline"]} {segment["flight_number"]}  
+                            ⏱️ **Duration:** {segment["duration"]} mins
+                            """)
+                else:  # One way
+                    for segment in flight["flights"]:
+                        st.markdown(f"""
+                        🛫 **{segment["departure_airport"]["time"]}** from {segment["departure_airport"]["name"]} ({segment["departure_airport"]["id"]})  
+                        🛬 **{segment["arrival_airport"]["time"]}** at {segment["arrival_airport"]["name"]} ({segment["arrival_airport"]["id"]})  
+                        ✈️ {segment["airline"]} {segment["flight_number"]}  
+                        ⏱️ **Duration:** {segment["duration"]} mins
+                        """)
             
             with cols[1]:
-                # Price and booking
-                price = flight.get("price", "Unknown")  # Price is directly in the flight
+                price = flight.get("price", "Unknown")
                 st.markdown(f"### ${price}")
                 
                 # Get travel class from first flight segment
-                travel_class = first_flight.get("travel_class", "Economy")
+                travel_class = flight["flights"][0].get("travel_class", "Economy")
                 st.markdown(f"*{travel_class}*")
                 
-                flight_id = flight.get('id', str(hash(str(flight))))  # Fallback to hash if no ID
+                # Total duration
+                total_duration = flight.get("total_duration", "Unknown")
+                st.markdown(f"**Total Duration:** {total_duration} mins")
+                
+                flight_id = str(hash(str(flight)))
                 if st.button("Select Flight", key=f"select_{flight_id}", type="primary"):
                     st.session_state.selected_flight = flight
                     st.success("Flight selected!")
@@ -114,15 +127,11 @@ def main():
     else:
         if "flights" in st.session_state and st.session_state.flights:
             st.subheader("Available Flights")
-            display_flight_cards(st.session_state.flights)
+            display_flight_cards(
+                st.session_state.flights, 
+                st.session_state.flight_params.trip_type
+            )
             
-            # Add a button to start over
-            if st.button("New Search"):
-                st.session_state.search_mode = False
-                st.session_state.messages = []
-                st.session_state.flight_params = FlightParams()
-                st.session_state.pop('flights', None)
-                st.rerun()
 
 if __name__ == "__main__":
     main() 
