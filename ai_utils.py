@@ -145,11 +145,8 @@ def parse_json_from_text(text: str) -> Dict[str, Any]:
         A dictionary representing the parsed JSON.
     """
 
-    #print(f"DEBUG - Raw response to parse: {text}")
 
-    # First, check if the response is just plain text (no JSON structure)
     if not any(char in text for char in "{["):
-        # If it's plain text, wrap it as a message
         return {
             "message": text.strip(),
             "completion": False
@@ -172,7 +169,6 @@ def parse_json_from_text(text: str) -> Dict[str, Any]:
                     json_str = matches.group(1)  # Use capture group for code blocks
                 
                 json_str = json_str.strip()
-                #print(f"DEBUG - Extracted JSON string: {json_str}")
                 return json.loads(json_str)
 
     except json.JSONDecodeError as e:
@@ -226,7 +222,6 @@ def run_booking_loop(initial_prompt: str = "I want to book a flight.") -> Flight
 
     while not current_params.completion:
         ai_response = get_model_response(user_input, current_params)
-        #print(f"DEBUG - AI Response: {ai_response}")
 
         if not ai_response:
             print("Failed to get a valid response from the AI.")
@@ -234,7 +229,6 @@ def run_booking_loop(initial_prompt: str = "I want to book a flight.") -> Flight
         # Update parameters with AI response
         try:
             current_params = update_parameters(current_params, ai_response)
-            #print(f"DEBUG - Updated params: {current_params}")
         except Exception as e:
             print(f"Error updating parameters: {str(e)}")
             break
