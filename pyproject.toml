@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
     "google-search-results>=2.4.2",
+    "googlemaps>=4.10.0",
     "openai>=1.52.0",
     "pydantic>=2.9.2",
     "python-dotenv>=1.0.1",
